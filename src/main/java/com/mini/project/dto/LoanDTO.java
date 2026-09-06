@@ -1,6 +1,8 @@
 package com.mini.project.dto;
 
 import com.mini.project.entities.Loan;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,10 +19,13 @@ public class LoanDTO {
     @Positive
     private Long loanId;
 
+    @PastOrPresent(message = "Loan date cannot be in the future")
     private Date loanDate;
 
+    @Future(message = "Due date must be in the future")
     private Date dueDate;
 
+    @PastOrPresent(message = "Return date cannot be in the future")
     private Date returnDate;
 
     private Boolean isReturned;
