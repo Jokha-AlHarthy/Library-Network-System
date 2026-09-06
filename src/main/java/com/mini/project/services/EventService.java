@@ -1,6 +1,7 @@
 package com.mini.project.services;
 
 import com.mini.project.entities.Event;
+import com.mini.project.exceptions.ResourceNotFoundException;
 import com.mini.project.repositories.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,14 +41,17 @@ public class EventService {
         if (event.isPresent() && event.get().getIsActive()) {
             return event.get();
         }
-        return new Event();
+        throw new ResourceNotFoundException("Event not found with id: " + id);
     }
 
     //Update service
     public Event updateEvent(Long id, String updateTitle, Date updateEventDate, String updateDescription) throws Exception{
-        Event eventToUpdate =  eventRepository.getById(id);
-        if(eventToUpdate==null){
-            throw new Exception("Event is not found by the id");
+        Event eventToUpdate = eventRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Event not found with id: " + id));
+
+        if (!eventToUpdate.getIsActive()) {
+            throw new ResourceNotFoundException("Event not found with id: " + id);
         }
         eventToUpdate.setUpdatedDate(new Date());
         eventToUpdate.setTitle(updateTitle);
@@ -59,9 +63,12 @@ public class EventService {
 
     //Delete service
     public Boolean deleteById(Long id){
-        Event deleteEvent = eventRepository.getById(id);
-        if(deleteEvent == null){
-            return false;
+        Event deleteEvent = eventRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Event not found with id: " + id));
+
+        if (!deleteEvent.getIsActive()) {
+            throw new ResourceNotFoundException("Event not found with id: " + id);
         }
         deleteEvent.setIsActive(false);
         deleteEvent.setUpdatedDate(new Date());
