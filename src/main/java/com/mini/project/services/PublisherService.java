@@ -2,6 +2,7 @@ package com.mini.project.services;
 
 import com.mini.project.entities.Author;
 import com.mini.project.entities.Publisher;
+import com.mini.project.exceptions.ResourceNotFoundException;
 import com.mini.project.repositories.PublisherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,14 +42,17 @@ public class PublisherService {
         if (publisher.isPresent() && publisher.get().getIsActive()) {
             return publisher.get();
         }
-        return new Publisher();
+        throw new ResourceNotFoundException("Publisher not found with id: " + id);
     }
 
     //Update service
     public Publisher updatePublisher(Long id, String updateName, String updateAddress, String updateContactEmail) throws Exception{
-        Publisher publisherToUpdate =  publisherRepository.getById(id);
-        if(publisherToUpdate==null){
-            throw new Exception("Publisher is not found by the id");
+        Publisher publisherToUpdate = publisherRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Publisher not found with id: " + id));
+
+        if (!publisherToUpdate.getIsActive()) {
+            throw new ResourceNotFoundException("Publisher not found with id: " + id);
         }
         publisherToUpdate.setUpdatedDate(new Date());
         publisherToUpdate.setName(updateName);
@@ -60,9 +64,12 @@ public class PublisherService {
 
     //Delete service
     public Boolean deleteById(Long id){
-        Publisher deletePublisher = publisherRepository.getById(id);
-        if(deletePublisher == null){
-            return false;
+        Publisher deletePublisher = publisherRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Publisher not found with id: " + id));
+
+        if (!deletePublisher.getIsActive()) {
+            throw new ResourceNotFoundException("Publisher not found with id: " + id);
         }
         deletePublisher.setIsActive(false);
         deletePublisher.setUpdatedDate(new Date());
