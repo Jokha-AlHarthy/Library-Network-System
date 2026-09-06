@@ -2,6 +2,7 @@ package com.mini.project.services;
 
 import com.mini.project.entities.Author;
 import com.mini.project.entities.Review;
+import com.mini.project.exceptions.ResourceNotFoundException;
 import com.mini.project.repositories.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,14 +42,19 @@ public class ReviewService {
         if (review.isPresent() && review.get().getIsActive()) {
             return review.get();
         }
-        return new Review();
+        throw new ResourceNotFoundException("Review not found with id: " + id);
     }
 
     //Update service
     public Review updateReview(Long id, Integer updateRating, String updateComment, Date updateReviewDate) throws Exception{
-        Review reviewToUpdate =  reviewRepository.getById(id);
-        if(reviewToUpdate==null){
-            throw new Exception("Author is not found by the id");
+        Review reviewToUpdate = reviewRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Review not found with id: " + id));
+
+        if (!reviewToUpdate.getIsActive()) {
+            throw new ResourceNotFoundException(
+                    "Review not found with id: " + id);
         }
         reviewToUpdate.setUpdatedDate(new Date());
         reviewToUpdate.setRating(updateRating);
@@ -60,9 +66,14 @@ public class ReviewService {
 
     //Delete service
     public Boolean deleteById(Long id){
-        Review deleteReview = reviewRepository.getById(id);
-        if(deleteReview == null){
-            return false;
+        Review deleteReview = reviewRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Review not found with id: " + id));
+
+        if (!deleteReview.getIsActive()) {
+            throw new ResourceNotFoundException(
+                    "Review not found with id: " + id);
         }
         deleteReview.setIsActive(false);
         deleteReview.setUpdatedDate(new Date());
