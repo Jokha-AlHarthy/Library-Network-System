@@ -69,4 +69,8 @@ public class ReviewService {
         reviewRepository.save(deleteReview);
         return true;
     }
+
+    public Double getAverageRating(Long bookId) {
+        return reviewRepository.getAverageRating(bookId);
+    }
 }
