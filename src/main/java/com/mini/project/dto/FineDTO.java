@@ -2,6 +2,7 @@ package com.mini.project.dto;
 
 import com.mini.project.entities.Fine;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -19,7 +20,13 @@ public class FineDTO {
     @Positive
     private Long fineId;
 
-    @Positive
+    @Positive(message = "Member ID must be positive")
+    private Long memberId;
+
+    @Positive(message = "Loan ID must be positive")
+    private Long loanId;
+
+    @Positive(message = "Fine amount must be positive")
     private Double amount;
 
     @NotBlank(message = "Fine reason cannot be blank")
@@ -30,12 +37,14 @@ public class FineDTO {
     @Size(min = 2, max = 30, message = "Fine status has to be between 2 and 30 characters")
     private String status;
 
+    @PastOrPresent(message = "Issued date cannot be in the future")
     private Date issuedDate;
-
 
     public static FineDTO convertToDTO(Fine entity) {
         FineDTO dto = FineDTO.builder()
                 .fineId(entity.getId())
+                .memberId(entity.getMember() != null ? entity.getMember().getId() : null)
+                .loanId(entity.getLoan() != null ? entity.getLoan().getId() : null)
                 .amount(entity.getAmount())
                 .reason(entity.getReason())
                 .status(entity.getStatus())
