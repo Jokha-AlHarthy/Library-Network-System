@@ -4,6 +4,8 @@ import com.mini.project.entities.Author;
 import com.mini.project.entities.Book;
 import com.mini.project.entities.Member;
 import com.mini.project.entities.Reservation;
+import com.mini.project.exceptions.BusinessRuleException;
+import com.mini.project.exceptions.ResourceNotFoundException;
 import com.mini.project.repositories.BookRepository;
 import com.mini.project.repositories.MemberRepository;
 import com.mini.project.repositories.ReservationRepository;
@@ -49,14 +51,19 @@ public class ReservationService {
         if (reservation.isPresent() && reservation.get().getIsActive()) {
             return reservation.get();
         }
-        return new Reservation();
+        throw new ResourceNotFoundException("Reservation not found with id: " + id);
     }
 
     //Update service
     public Reservation updateReservation(Long id, Date updateReservationDate, String updateStatus) throws Exception{
-        Reservation reservationToUpdate =  reservationRepository.getById(id);
-        if(reservationToUpdate==null){
-            throw new Exception("Reservation is not found by the id");
+        Reservation reservationToUpdate =
+                reservationRepository.findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Reservation not found with id: " + id));
+        if (!reservationToUpdate.getIsActive()) {
+            throw new ResourceNotFoundException(
+                    "Reservation not found with id: " + id);
         }
         reservationToUpdate.setUpdatedDate(new Date());
         reservationToUpdate.setReservationDate(updateReservationDate);
@@ -67,9 +74,14 @@ public class ReservationService {
 
     //Delete service
     public Boolean deleteById(Long id){
-        Reservation deleteReservation = reservationRepository.getById(id);
-        if(deleteReservation == null){
-            return false;
+        Reservation deleteReservation =
+                reservationRepository.findById(id)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Reservation not found with id: " + id));
+        if (!deleteReservation.getIsActive()) {
+            throw new ResourceNotFoundException(
+                    "Reservation not found with id: " + id);
         }
         deleteReservation.setIsActive(false);
         deleteReservation.setUpdatedDate(new Date());
@@ -77,11 +89,24 @@ public class ReservationService {
         return true;
     }
 
-    public Long reserveBook(Long memberId, Long bookId) throws Exception {
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new Exception("Member not found"));
-        Book book = bookRepository.findById(bookId).orElseThrow(() -> new Exception("Book not found"));
+    public Long reserveBook(Long memberId, Long bookId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Member not found with id: " + memberId));
+        if (!member.getIsActive()) {
+            throw new BusinessRuleException("Member is inactive");
+        }
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Book not found with id: " + bookId));
+        if (!book.getIsActive()) {
+            throw new BusinessRuleException("Book is inactive");
+        }
         if (book.getAvailableCopies() > 0) {
-            throw new Exception("Book is available, no reservation needed");
+            throw new BusinessRuleException(
+                    "Book is available, no reservation needed");
         }
         Reservation reservation = new Reservation();
         reservation.setMember(member);
