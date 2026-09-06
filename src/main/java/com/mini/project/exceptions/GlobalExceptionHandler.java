@@ -1,5 +1,13 @@
 package com.mini.project.exceptions;
 
+```java
+        package com.mini.project.exceptions;
+
+import com.mini.project.exceptions.BusinessRuleException;
+import com.mini.project.exceptions.ErrorResponse;
+import com.mini.project.exceptions.ResourceNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -11,10 +19,14 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     // 404 - Resource not found
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
             ResourceNotFoundException ex) {
+
+        logger.warn("Resource not found: {}", ex.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.NOT_FOUND.value(),
@@ -37,6 +49,8 @@ public class GlobalExceptionHandler {
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.joining(", "));
 
+        logger.warn("Validation error: {}", message);
+
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
@@ -52,6 +66,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleBusinessRuleException(
             BusinessRuleException ex) {
 
+        logger.warn("Business rule violation: {}", ex.getMessage());
+
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
@@ -65,6 +81,8 @@ public class GlobalExceptionHandler {
     // 500 - Unexpected error
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericExceptions(Exception ex) {
+
+        logger.error("Unexpected error: {}", ex.getMessage(), ex);
 
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
