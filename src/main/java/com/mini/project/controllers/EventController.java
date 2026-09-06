@@ -1,7 +1,9 @@
 package com.mini.project.controllers;
 
+import com.mini.project.dto.EventDTO;
 import com.mini.project.entities.Event;
 import com.mini.project.services.EventService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,29 +21,32 @@ public class EventController {
     }
 
     @PostMapping("add")
-    public Long addEvent(@RequestParam String title,
-                         @RequestParam Date eventDate,
-                         @RequestParam String description) {
-        return eventService.addEvent(title, eventDate, description);
+    public Long addEvent(@Valid @RequestBody EventDTO dto) {
+        return eventService.addEvent(
+                dto.getEventTitle(),
+                dto.getEventDate(),
+                dto.getEventDescription());
     }
 
     @GetMapping("getAll")
-    public List<Event> getAllEvents() {
-        return eventService.getAllEvents();
+    public List<EventDTO> getAllEvents() {
+        List<EventDTO> events =
+                EventDTO.convertToDTO(eventService.getAllEvents());
+        return events;
     }
 
     @GetMapping("getById")
-    public Event getById(@RequestParam Long id) {
-        return eventService.getById(id);
+    public EventDTO getById(@RequestParam Long id) {
+        return EventDTO.convertToDTO(eventService.getById(id));
     }
 
     @PutMapping("update")
-    public Event updateEvent(@RequestParam Long id,
-                             @RequestParam String updateTitle,
-                             @RequestParam Date updateEventDate,
-                             @RequestParam String updateDescription) throws Exception {
-        return eventService.updateEvent(id, updateTitle,
-                updateEventDate, updateDescription);
+    public EventDTO updateEvent(@Valid @RequestBody EventDTO dto) throws Exception {
+        return EventDTO.convertToDTO(eventService.updateEvent(
+                dto.getEventId(),
+                dto.getEventTitle(),
+                dto.getEventDate(),
+                dto.getEventDescription()));
     }
 
     @DeleteMapping("deleteById")
