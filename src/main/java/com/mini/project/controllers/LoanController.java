@@ -1,7 +1,9 @@
 package com.mini.project.controllers;
 
+import com.mini.project.dto.LoanDTO;
 import com.mini.project.entities.Loan;
 import com.mini.project.services.LoanService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,31 +21,33 @@ public class LoanController {
     }
 
     @PostMapping("add")
-    public Long addLoan(@RequestParam Date loanDate,
-                        @RequestParam Date dueDate,
-                        @RequestParam Date returnDate,
-                        @RequestParam Boolean isReturned) {
-        return loanService.addLoan(loanDate, dueDate, returnDate, isReturned);
+    public Long addLoan(@Valid @RequestBody LoanDTO dto) {
+        return loanService.addLoan(
+                dto.getLoanDate(),
+                dto.getDueDate(),
+                dto.getReturnDate(),
+                dto.getIsReturned());
     }
 
     @GetMapping("getAll")
-    public List<Loan> getAllLoans() {
-        return loanService.getAllLoans();
+    public List<LoanDTO> getAllLoans() {
+        List<LoanDTO> loans = LoanDTO.convertToDTO(loanService.getAllLoans());
+        return loans;
     }
 
     @GetMapping("getById")
-    public Loan getById(@RequestParam Long id) {
-        return loanService.getById(id);
+    public LoanDTO getById(@RequestParam Long id) {
+        return LoanDTO.convertToDTO(loanService.getById(id));
     }
 
     @PutMapping("update")
-    public Loan updateLoan(@RequestParam Long id,
-                           @RequestParam Date updateLoanDate,
-                           @RequestParam Date updateDueDate,
-                           @RequestParam Date updateReturnDate,
-                           @RequestParam Boolean updateIsReturned) throws Exception {
-        return loanService.updateLoan(id, updateLoanDate, updateDueDate,
-                updateReturnDate, updateIsReturned);
+    public LoanDTO updateLoan(@Valid @RequestBody LoanDTO dto) throws Exception {
+        return LoanDTO.convertToDTO(loanService.updateLoan(
+                dto.getLoanId(),
+                dto.getLoanDate(),
+                dto.getDueDate(),
+                dto.getReturnDate(),
+                dto.getIsReturned()));
     }
 
     @DeleteMapping("deleteById")
