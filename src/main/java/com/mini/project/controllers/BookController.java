@@ -39,6 +39,18 @@ public class BookController {
         return BookDTO.convertToDTO(bookService.getById(id));
     }
 
+    @GetMapping("byAuthor")
+    public List<BookDTO> getBooksByAuthor(@RequestParam Long authorId) {
+        return BookDTO.convertToDTO(bookService.getBooksByAuthor(authorId)
+        );
+    }
+
+    @GetMapping("zeroCopies")
+    public List<BookDTO> getZeroCopies() {
+        return BookDTO.convertToDTO(bookService.getZeroCopies()
+        );
+    }
+
     @PutMapping("update")
     public BookDTO updateBook(@Valid @RequestBody BookDTO dto) throws Exception {
         return BookDTO.convertToDTO(bookService.updateBook(
