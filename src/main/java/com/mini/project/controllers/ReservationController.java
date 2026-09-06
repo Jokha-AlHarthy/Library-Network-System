@@ -50,4 +50,10 @@ public class ReservationController {
     public Boolean deleteReservation(@RequestParam Long id) {
         return reservationService.deleteById(id);
     }
+
+    @PostMapping("reserve")
+    public Long reserveBook(@RequestParam Long memberId, @RequestParam Long bookId) throws Exception {
+
+        return reservationService.reserveBook(memberId, bookId);
+    }
 }
