@@ -15,4 +15,15 @@ public interface FineRepository extends JpaRepository<Fine, Long> {
 
     @Query("SELECT f FROM Fine f WHERE f.isActive=true AND f.id=:fine")
     Fine getById(@Param("fine") Long id);
+
+    @Query("SELECT f FROM Fine f WHERE f.isActive=true AND f.status='UNPAID'")
+    List<Fine> getUnpaidFines();
+
+    @Query("""
+       SELECT f.member.id, SUM(f.amount)
+       FROM Fine f
+       WHERE f.isActive=true
+       GROUP BY f.member.id
+       """)
+    List<Object[]> getMemberFines();
 }
