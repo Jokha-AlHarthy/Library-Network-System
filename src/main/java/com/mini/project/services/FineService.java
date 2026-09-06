@@ -2,6 +2,8 @@ package com.mini.project.services;
 
 import com.mini.project.entities.Author;
 import com.mini.project.entities.Fine;
+import com.mini.project.exceptions.BusinessRuleException;
+import com.mini.project.exceptions.ResourceNotFoundException;
 import com.mini.project.repositories.AuthorRepository;
 import com.mini.project.repositories.FineRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,14 +45,17 @@ public class FineService {
         if (fine.isPresent() && fine.get().getIsActive()) {
             return fine.get();
         }
-        return new Fine();
+        throw new ResourceNotFoundException("Fine not found with id: " + id);
     }
 
     //Update service
     public Fine updateFine(Long id, Double updateAmount, String updateReason, String updateStatus, Date updateIssuedDate) throws Exception{
-        Fine fineToUpdate =  fineRepository.getById(id);
-        if(fineToUpdate==null){
-            throw new Exception("Fine is not found by the id");
+        Fine fineToUpdate = fineRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Fine not found with id: " + id));
+
+        if (!fineToUpdate.getIsActive()) {
+            throw new ResourceNotFoundException("Fine not found with id: " + id);
         }
         fineToUpdate.setUpdatedDate(new Date());
         fineToUpdate.setAmount(updateAmount);
@@ -62,9 +67,12 @@ public class FineService {
 
     //Delete service
     public Boolean deleteById(Long id){
-        Fine deleteFine = fineRepository.getById(id);
-        if(deleteFine == null){
-            return false;
+        Fine deleteFine = fineRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Fine not found with id: " + id));
+
+        if (!deleteFine.getIsActive()) {
+            throw new ResourceNotFoundException("Fine not found with id: " + id);
         }
         deleteFine.setIsActive(false);
         deleteFine.setUpdatedDate(new Date());
@@ -72,10 +80,16 @@ public class FineService {
         return true;
     }
 
-    public Boolean payFine(Long id) throws Exception {
-        Fine fine = fineRepository.getById(id);
-        if (fine == null) {
-            throw new Exception("Fine not found");
+    public Boolean payFine(Long id) {
+
+        Fine fine = fineRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Fine not found with id: " + id));
+        if (!fine.getIsActive()) {
+            throw new ResourceNotFoundException("Fine not found with id: " + id);
+        }
+        if ("PAID".equalsIgnoreCase(fine.getStatus())) {
+            throw new BusinessRuleException("Fine is already paid");
         }
         fine.setStatus("PAID");
         fine.setUpdatedDate(new Date());
