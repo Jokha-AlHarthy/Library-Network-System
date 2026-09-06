@@ -13,6 +13,6 @@ public interface AuthorRepository extends JpaRepository<Author, Long> {
     @Query("SELECT a FROM Author a WHERE a.isActive=true")
     List<Author> getAllAuthors();
 
-    @Query("SELECT a FROM Author a WHERE a.isActive=true AND id=:author")
+    @Query("SELECT a FROM Author a WHERE a.isActive=true AND a.id=:author")
     Author getById(@Param("author") Long id);
 }
