@@ -2,6 +2,7 @@ package com.mini.project.services;
 
 import com.mini.project.entities.Branch;
 import com.mini.project.entities.Category;
+import com.mini.project.exceptions.ResourceNotFoundException;
 import com.mini.project.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,17 +44,19 @@ public class CategoryService {
         if (category.isPresent() && category.get().getIsActive()) {
             return category.get();
         }
-        return new Category();
+        throw new ResourceNotFoundException("Category not found with id: " + id);
     }
 
     //Update service
     public Category updateCategory(Long id, String updateName, String updateDescription) throws Exception{
-        Category categoryToUpdate =  categoryRepository.getById(id);
-        if(categoryToUpdate==null){
-            throw new Exception("Category is not found by the id");
+        Category categoryToUpdate = categoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Category not found with id: " + id));
+
+        if (!categoryToUpdate.getIsActive()) {
+            throw new ResourceNotFoundException("Category not found with id: " + id);
         }
         categoryToUpdate.setUpdatedDate(new Date());
-        categoryToUpdate.setName(updateName);
         categoryToUpdate.setName(updateName);
         categoryToUpdate.setDescription(updateDescription);
         categoryToUpdate = categoryRepository.save(categoryToUpdate);
@@ -62,9 +65,11 @@ public class CategoryService {
 
     //Delete service
     public Boolean deleteById(Long id){
-        Category deleteCategory = categoryRepository.getById(id);
-        if(deleteCategory == null){
-            return false;
+        Category deleteCategory = categoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Category not found with id: " + id));
+        if (!deleteCategory.getIsActive()) {
+            throw new ResourceNotFoundException("Category not found with id: " + id);
         }
         deleteCategory.setIsActive(false);
         deleteCategory.setUpdatedDate(new Date());
