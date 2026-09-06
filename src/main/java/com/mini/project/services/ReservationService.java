@@ -1,7 +1,11 @@
 package com.mini.project.services;
 
 import com.mini.project.entities.Author;
+import com.mini.project.entities.Book;
+import com.mini.project.entities.Member;
 import com.mini.project.entities.Reservation;
+import com.mini.project.repositories.BookRepository;
+import com.mini.project.repositories.MemberRepository;
 import com.mini.project.repositories.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,9 +17,14 @@ import java.util.Optional;
 @Service
 public class ReservationService {
     ReservationRepository reservationRepository;
+    BookRepository bookRepository;
+    MemberRepository memberRepository;
+
     @Autowired
-    public ReservationService(ReservationRepository reservationRepository) {
+    public ReservationService(ReservationRepository reservationRepository, BookRepository bookRepository, MemberRepository memberRepository) {
         this.reservationRepository = reservationRepository;
+        this.bookRepository = bookRepository;
+        this.memberRepository = memberRepository;
     }
 
     //Add service
@@ -66,5 +75,21 @@ public class ReservationService {
         deleteReservation.setUpdatedDate(new Date());
         reservationRepository.save(deleteReservation);
         return true;
+    }
+
+    public Long reserveBook(Long memberId, Long bookId) throws Exception {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new Exception("Member not found"));
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new Exception("Book not found"));
+        if (book.getAvailableCopies() > 0) {
+            throw new Exception("Book is available, no reservation needed");
+        }
+        Reservation reservation = new Reservation();
+        reservation.setMember(member);
+        reservation.setBook(book);
+        reservation.setReservationDate(new Date());
+        reservation.setStatus("ACTIVE");
+        reservation.setIsActive(true);
+        reservation.setCreatedDate(new Date());
+        return reservationRepository.save(reservation).getId();
     }
 }
