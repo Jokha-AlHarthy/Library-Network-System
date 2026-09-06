@@ -1,7 +1,9 @@
 package com.mini.project.controllers;
 
+import com.mini.project.dto.MemberDTO;
 import com.mini.project.entities.Member;
 import com.mini.project.services.MemberService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,31 +20,33 @@ public class MemberController {
     }
 
     @PostMapping("add")
-    public Long addMember(@RequestParam String name,
-                          @RequestParam String email,
-                          @RequestParam String phoneNumber,
-                          @RequestParam String membershipType) {
-        return memberService.addMember(name, email, phoneNumber, membershipType);
+    public Long addMember(@Valid @RequestBody MemberDTO dto) {
+        return memberService.addMember(
+                dto.getMemberName(),
+                dto.getMemberEmail(),
+                dto.getMemberPhoneNumber(),
+                dto.getMembershipType());
     }
 
     @GetMapping("getAll")
-    public List<Member> getAllMembers() {
-        return memberService.getAllMembers();
+    public List<MemberDTO> getAllMembers() {
+        List<MemberDTO> members = MemberDTO.convertToDTO(memberService.getAllMembers());
+        return members;
     }
 
     @GetMapping("getById")
-    public Member getById(@RequestParam Long id) {
-        return memberService.getById(id);
+    public MemberDTO getById(@RequestParam Long id) {
+        return MemberDTO.convertToDTO(memberService.getById(id));
     }
 
     @PutMapping("update")
-    public Member updateMember(@RequestParam Long id,
-                               @RequestParam String updateName,
-                               @RequestParam String updateEmail,
-                               @RequestParam String updatePhoneNumber,
-                               @RequestParam String updateMembershipType) throws Exception {
-        return memberService.updateMember(id, updateName, updateEmail,
-                updatePhoneNumber, updateMembershipType);
+    public MemberDTO updateMember(@Valid @RequestBody MemberDTO dto) throws Exception {
+        return MemberDTO.convertToDTO(memberService.updateMember(
+                dto.getMemberId(),
+                dto.getMemberName(),
+                dto.getMemberEmail(),
+                dto.getMemberPhoneNumber(),
+                dto.getMembershipType()));
     }
 
     @DeleteMapping("deleteById")
