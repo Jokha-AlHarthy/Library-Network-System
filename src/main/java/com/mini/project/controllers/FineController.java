@@ -1,7 +1,9 @@
 package com.mini.project.controllers;
 
+import com.mini.project.dto.FineDTO;
 import com.mini.project.entities.Fine;
 import com.mini.project.services.FineService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,31 +21,33 @@ public class FineController {
     }
 
     @PostMapping("add")
-    public Long addFine(@RequestParam Double amount,
-                        @RequestParam String reason,
-                        @RequestParam String status,
-                        @RequestParam Date issuedDate) {
-        return fineService.addFine(amount, reason, status, issuedDate);
+    public Long addFine(@Valid @RequestBody FineDTO dto) {
+        return fineService.addFine(
+                dto.getAmount(),
+                dto.getReason(),
+                dto.getStatus(),
+                dto.getIssuedDate());
     }
 
     @GetMapping("getAll")
-    public List<Fine> getAllFines() {
-        return fineService.getAllFines();
+    public List<FineDTO> getAllFines() {
+        List<FineDTO> fines = FineDTO.convertToDTO(fineService.getAllFines());
+        return fines;
     }
 
     @GetMapping("getById")
-    public Fine getById(@RequestParam Long id) {
-        return fineService.getById(id);
+    public FineDTO getById(@RequestParam Long id) {
+        return FineDTO.convertToDTO(fineService.getById(id));
     }
 
     @PutMapping("update")
-    public Fine updateFine(@RequestParam Long id,
-                           @RequestParam Double updateAmount,
-                           @RequestParam String updateReason,
-                           @RequestParam String updateStatus,
-                           @RequestParam Date updateIssuedDate) throws Exception {
-        return fineService.updateFine(id, updateAmount, updateReason,
-                updateStatus, updateIssuedDate);
+    public FineDTO updateFine(@Valid @RequestBody FineDTO dto) throws Exception {
+        return FineDTO.convertToDTO(fineService.updateFine(
+                dto.getFineId(),
+                dto.getAmount(),
+                dto.getReason(),
+                dto.getStatus(),
+                dto.getIssuedDate()));
     }
 
     @DeleteMapping("deleteById")
