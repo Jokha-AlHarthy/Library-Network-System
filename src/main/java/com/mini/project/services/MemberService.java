@@ -54,7 +54,6 @@ public class MemberService {
         }
         memberToUpdate.setUpdatedDate(new Date());
         memberToUpdate.setName(updateName);
-        memberToUpdate.setName(updateName);
         memberToUpdate.setEmail(updateEmail);
         memberToUpdate.setPhoneNumber(updatePhoneNumber);
         memberToUpdate.setMembershipType(updateMembershipType);
