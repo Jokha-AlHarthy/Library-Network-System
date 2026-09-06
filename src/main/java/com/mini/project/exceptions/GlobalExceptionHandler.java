@@ -1,11 +1,4 @@
 package com.mini.project.exceptions;
-
-```java
-        package com.mini.project.exceptions;
-
-import com.mini.project.exceptions.BusinessRuleException;
-import com.mini.project.exceptions.ErrorResponse;
-import com.mini.project.exceptions.ResourceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
