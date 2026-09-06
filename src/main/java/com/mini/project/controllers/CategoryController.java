@@ -1,7 +1,9 @@
 package com.mini.project.controllers;
 
+import com.mini.project.dto.CategoryDTO;
 import com.mini.project.entities.Category;
 import com.mini.project.services.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,26 +20,29 @@ public class CategoryController {
     }
 
     @PostMapping("add")
-    public Long addCategory(@RequestParam String name,
-                            @RequestParam String description) {
-        return categoryService.addCategory(name, description);
+    public Long addCategory(@Valid @RequestBody CategoryDTO dto) {
+        return categoryService.addCategory(
+                dto.getCategoryName(),
+                dto.getCategoryDescription());
     }
 
     @GetMapping("getAll")
-    public List<Category> getAllCategories() {
-        return categoryService.getAllCategories();
+    public List<CategoryDTO> getAllCategories() {
+        List<CategoryDTO> categories = CategoryDTO.convertToDTO(categoryService.getAllCategories());
+        return categories;
     }
 
     @GetMapping("getById")
-    public Category getById(@RequestParam Long id) {
-        return categoryService.getById(id);
+    public CategoryDTO getById(@RequestParam Long id) {
+        return CategoryDTO.convertToDTO(categoryService.getById(id));
     }
 
     @PutMapping("update")
-    public Category updateCategory(@RequestParam Long id,
-                                   @RequestParam String updateName,
-                                   @RequestParam String updateDescription) throws Exception {
-        return categoryService.updateCategory(id, updateName, updateDescription);
+    public CategoryDTO updateCategory(@Valid @RequestBody CategoryDTO dto) throws Exception {
+        return CategoryDTO.convertToDTO(categoryService.updateCategory(
+                dto.getCategoryId(),
+                dto.getCategoryName(),
+                dto.getCategoryDescription()));
     }
 
     @DeleteMapping("deleteById")
