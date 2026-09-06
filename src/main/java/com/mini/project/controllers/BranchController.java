@@ -37,6 +37,11 @@ public class BranchController {
         return BranchDTO.convertToDTO(branchService.getById(id));
     }
 
+    @GetMapping("stats")
+    public List<Object[]> getBranchStats() {
+        return branchService.getBranchStats();
+    }
+
     @PutMapping("update")
     public BranchDTO updateBranch(@Valid @RequestBody BranchDTO dto) throws Exception {
         return BranchDTO.convertToDTO(branchService.updateBranch(
