@@ -1,7 +1,9 @@
 package com.mini.project.controllers;
 
+import com.mini.project.dto.StaffDTO;
 import com.mini.project.entities.Staff;
 import com.mini.project.services.StaffService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,29 +20,31 @@ public class StaffController {
     }
 
     @PostMapping("add")
-    public Long addStaff(@RequestParam String name,
-                         @RequestParam String role,
-                         @RequestParam String phoneNumber) {
-        return staffService.addStaff(name, role, phoneNumber);
+    public Long addStaff(@Valid @RequestBody StaffDTO dto) {
+        return staffService.addStaff(
+                dto.getStaffName(),
+                dto.getStaffRole(),
+                dto.getStaffPhoneNumber());
     }
 
     @GetMapping("getAll")
-    public List<Staff> getAllStaffs() {
-        return staffService.getAllStaffs();
+    public List<StaffDTO> getAllStaffs() {
+        List<StaffDTO> staffs = StaffDTO.convertToDTO(staffService.getAllStaffs());
+        return staffs;
     }
 
     @GetMapping("getById")
-    public Staff getById(@RequestParam Long id) {
-        return staffService.getById(id);
+    public StaffDTO getById(@RequestParam Long id) {
+        return StaffDTO.convertToDTO(staffService.getById(id));
     }
 
     @PutMapping("update")
-    public Staff updateStaff(@RequestParam Long id,
-                             @RequestParam String updateName,
-                             @RequestParam String updateRole,
-                             @RequestParam String updatePhoneNumber) throws Exception {
-        return staffService.updateStaff(id, updateName,
-                updateRole, updatePhoneNumber);
+    public StaffDTO updateStaff(@Valid @RequestBody StaffDTO dto) throws Exception {
+        return StaffDTO.convertToDTO(staffService.updateStaff(
+                dto.getStaffId(),
+                dto.getStaffName(),
+                dto.getStaffRole(),
+                dto.getStaffPhoneNumber()));
     }
 
     @DeleteMapping("deleteById")
