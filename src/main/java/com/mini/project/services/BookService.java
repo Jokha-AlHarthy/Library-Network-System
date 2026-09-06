@@ -71,4 +71,12 @@ public class BookService {
         bookRepository.save(deleteBook);
         return true;
     }
+
+    public List<Book> getBooksByAuthor(Long authorId) {
+        return bookRepository.getBooksByAuthor(authorId);
+    }
+
+    public List<Book> getZeroCopies() {
+        return bookRepository.getZeroCopies();
+    }
 }
