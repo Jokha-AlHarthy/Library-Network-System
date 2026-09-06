@@ -16,5 +16,5 @@ public class Author extends BaseClass{
     private String nationality;
     private String biography;
     @OneToMany(cascade = CascadeType.ALL)
-    private List<Books> books;
+    private List<Book> books;
 }
