@@ -1,7 +1,9 @@
 package com.mini.project.controllers;
 
+import com.mini.project.dto.BookDTO;
 import com.mini.project.entities.Book;
 import com.mini.project.services.BookService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,31 +20,33 @@ public class BookController {
     }
 
     @PostMapping("add")
-    public Long addBook(@RequestParam String title,
-                        @RequestParam String isbn,
-                        @RequestParam Integer totalCopies,
-                        @RequestParam Integer availableCopies) {
-        return bookService.addBook(title, isbn, totalCopies, availableCopies);
+    public Long addBook(@Valid @RequestBody BookDTO dto) {
+        return bookService.addBook(
+                dto.getBookTitle(),
+                dto.getBookIsbn(),
+                dto.getTotalCopies(),
+                dto.getAvailableCopies());
     }
 
     @GetMapping("getAll")
-    public List<Book> getAllBooks() {
-        return bookService.getAllBooks();
+    public List<BookDTO> getAllBooks() {
+        List<BookDTO> books = BookDTO.convertToDTO(bookService.getAllBooks());
+        return books;
     }
 
     @GetMapping("getById")
-    public Book getById(@RequestParam Long id) {
-        return bookService.getById(id);
+    public BookDTO getById(@RequestParam Long id) {
+        return BookDTO.convertToDTO(bookService.getById(id));
     }
 
     @PutMapping("update")
-    public Book updateBook(@RequestParam Long id,
-                           @RequestParam String updateTitle,
-                           @RequestParam String updateIsbn,
-                           @RequestParam Integer updateTotalCopies,
-                           @RequestParam Integer updateAvailableCopies) throws Exception {
-        return bookService.updateBook(id, updateTitle, updateIsbn,
-                updateTotalCopies, updateAvailableCopies);
+    public BookDTO updateBook(@Valid @RequestBody BookDTO dto) throws Exception {
+        return BookDTO.convertToDTO(bookService.updateBook(
+                dto.getBookId(),
+                dto.getBookTitle(),
+                dto.getBookIsbn(),
+                dto.getTotalCopies(),
+                dto.getAvailableCopies()));
     }
 
     @DeleteMapping("deleteById")
