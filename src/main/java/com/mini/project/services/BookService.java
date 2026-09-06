@@ -1,7 +1,6 @@
 package com.mini.project.services;
-
-import com.mini.project.entities.Author;
 import com.mini.project.entities.Book;
+import com.mini.project.exceptions.ResourceNotFoundException;
 import com.mini.project.repositories.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,14 +41,17 @@ public class BookService {
         if (book.isPresent() && book.get().getIsActive()) {
             return book.get();
         }
-        return new Book();
+        throw new ResourceNotFoundException("Book not found with id: " + id);
     }
 
     //Update service
     public Book updateBook(Long id, String updateTitle, String updateIsbn, Integer updateTotalCopies, Integer updateAvailableCopies) throws Exception{
-        Book bookToUpdate =  bookRepository.getById(id);
-        if(bookToUpdate==null){
-            throw new Exception("Book is not found by the id");
+        Book bookToUpdate = bookRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Book not found with id: " + id));
+
+        if (!bookToUpdate.getIsActive()) {
+            throw new ResourceNotFoundException("Book not found with id: " + id);
         }
         bookToUpdate.setUpdatedDate(new Date());
         bookToUpdate.setTitle(updateTitle);
@@ -62,9 +64,12 @@ public class BookService {
 
     //Delete service
     public Boolean deleteById(Long id){
-        Book deleteBook = bookRepository.getById(id);
-        if(deleteBook == null){
-            return false;
+        Book deleteBook = bookRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Book not found with id: " + id));
+
+        if (!deleteBook.getIsActive()) {
+            throw new ResourceNotFoundException("Book not found with id: " + id);
         }
         deleteBook.setIsActive(false);
         deleteBook.setUpdatedDate(new Date());
