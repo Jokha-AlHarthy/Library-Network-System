@@ -1,7 +1,9 @@
 package com.mini.project.controllers;
 
+import com.mini.project.dto.AuthorDTO;
 import com.mini.project.entities.Author;
 import com.mini.project.services.AuthorService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,28 +20,31 @@ public class AuthorController {
     }
 
     @PostMapping("add")
-    public Long addAuthor(@RequestParam String name,
-                          @RequestParam String nationality,
-                          @RequestParam String biography) {
-        return authorService.addAuthor(name, nationality, biography);
+    public Long addAuthor(@Valid @RequestBody AuthorDTO dto) {
+        return authorService.addAuthor( dto.getAuthorName(),
+                dto.getAuthorNationality(),
+                dto.getAuthorBiography());
     }
 
     @GetMapping("getAll")
-    public List<Author> getAllAuthors() {
-        return authorService.getAllAuthors();
+    public List<AuthorDTO> getAllAuthors() {
+        List<AuthorDTO> authors =
+                AuthorDTO.convertToDTO(authorService.getAllAuthors());
+        return authors;
     }
 
     @GetMapping("getById")
-    public Author getById(@RequestParam Long id) {
-        return authorService.getById(id);
+    public AuthorDTO getById(@RequestParam Long id) {
+        return AuthorDTO.convertToDTO(authorService.getById(id));
     }
 
     @PutMapping("update")
-    public Author updateAuthor(@RequestParam Long id,
-                               @RequestParam String updateName,
-                               @RequestParam String updateNationality,
-                               @RequestParam String updateBiography) throws Exception {
-        return authorService.updateAuthor(id, updateName, updateNationality, updateBiography);
+    public AuthorDTO updateAuthor(@Valid @RequestBody AuthorDTO dto) throws Exception {
+        return AuthorDTO.convertToDTO(authorService.updateAuthor(
+                dto.getAuthorId(),
+                dto.getAuthorName(),
+                dto.getAuthorNationality(),
+                dto.getAuthorBiography()));
     }
 
     @DeleteMapping("deleteById")
