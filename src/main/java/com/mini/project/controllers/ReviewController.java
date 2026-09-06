@@ -39,6 +39,11 @@ public class ReviewController {
         return ReviewDTO.convertToDTO(reviewService.getById(id));
     }
 
+    @GetMapping("averageRating")
+    public Double getAverageRating(@RequestParam Long bookId) {
+        return reviewService.getAverageRating(bookId);
+    }
+
     @PutMapping("update")
     public ReviewDTO updateReview(@Valid @RequestBody ReviewDTO dto) throws Exception {
         return ReviewDTO.convertToDTO(reviewService.updateReview(
