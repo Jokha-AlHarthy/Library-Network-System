@@ -40,6 +40,16 @@ public class FineController {
         return FineDTO.convertToDTO(fineService.getById(id));
     }
 
+    @GetMapping("unpaid")
+    public List<FineDTO> getUnpaidFines() {
+        return FineDTO.convertToDTO(fineService.getUnpaidFines());
+    }
+
+    @GetMapping("memberStats")
+    public List<Object[]> getMemberFines() {
+        return fineService.getMemberFines();
+    }
+
     @PutMapping("update")
     public FineDTO updateFine(@Valid @RequestBody FineDTO dto) throws Exception {
         return FineDTO.convertToDTO(fineService.updateFine(
@@ -48,6 +58,11 @@ public class FineController {
                 dto.getReason(),
                 dto.getStatus(),
                 dto.getIssuedDate()));
+    }
+
+    @PutMapping("pay")
+    public Boolean payFine(@RequestParam Long id) throws Exception {
+        return fineService.payFine(id);
     }
 
     @DeleteMapping("deleteById")
