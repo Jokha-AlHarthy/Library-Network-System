@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-public class Branch {
+public class Branch extends BaseClass{
     private String name;
     private String location;
 
