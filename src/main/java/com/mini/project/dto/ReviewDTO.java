@@ -17,6 +17,12 @@ public class ReviewDTO {
     @Positive
     private Long reviewId;
 
+    @Positive(message = "Book ID must be positive")
+    private Long bookId;
+
+    @Positive(message = "Member ID must be positive")
+    private Long memberId;
+
     @Min(value = 1, message = "Rating must be at least 1")
     @Max(value = 5, message = "Rating cannot be more than 5")
     private Integer rating;
@@ -25,12 +31,14 @@ public class ReviewDTO {
     @Size(min = 2, max = 500, message = "Review comment has to be between 2 and 500 characters")
     private String comment;
 
+    @PastOrPresent(message = "Review date cannot be in the future")
     private Date reviewDate;
-
 
     public static ReviewDTO convertToDTO(Review entity) {
         ReviewDTO dto = ReviewDTO.builder()
                 .reviewId(entity.getId())
+                .bookId(entity.getBook() != null ? entity.getBook().getId() : null)
+                .memberId(entity.getMember() != null ? entity.getMember().getId() : null)
                 .rating(entity.getRating())
                 .comment(entity.getComment())
                 .reviewDate(entity.getReviewDate())
