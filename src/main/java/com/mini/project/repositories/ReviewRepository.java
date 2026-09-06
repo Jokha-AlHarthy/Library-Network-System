@@ -14,6 +14,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT r FROM Review r WHERE r.isActive=true")
     List<Review> getAllReviews();
 
-    @Query("SELECT r FROM Review r WHERE r.isActive=true AND a.id=:review")
+    @Query("SELECT r FROM Review r WHERE r.isActive=true AND r.id=:review")
     Review getById(@Param("review") Long id);
 }
