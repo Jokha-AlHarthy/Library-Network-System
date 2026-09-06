@@ -68,4 +68,8 @@ public class BranchService {
         branchRepository.save(deleteBranch);
         return true;
     }
+
+    public List<Object[]> getBranchStats() {
+        return branchRepository.getBranchStats();
+    }
 }
