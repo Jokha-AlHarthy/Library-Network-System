@@ -1,7 +1,9 @@
 package com.mini.project.controllers;
 
+import com.mini.project.dto.BranchDTO;
 import com.mini.project.entities.Branch;
 import com.mini.project.services.BranchService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,26 +20,29 @@ public class BranchController {
     }
 
     @PostMapping("add")
-    public Long addBranch(@RequestParam String name,
-                          @RequestParam String location) {
-        return branchService.addBranch(name, location);
+    public Long addBranch(@Valid @RequestBody BranchDTO dto) {
+        return branchService.addBranch(
+                dto.getBranchName(),
+                dto.getBranchLocation());
     }
 
     @GetMapping("getAll")
-    public List<Branch> getAllBranches() {
-        return branchService.getAllBranches();
+    public List<BranchDTO> getAllBranches() {
+        List<BranchDTO> branches = BranchDTO.convertToDTO(branchService.getAllBranches());
+        return branches;
     }
 
     @GetMapping("getById")
-    public Branch getById(@RequestParam Long id) {
-        return branchService.getById(id);
+    public BranchDTO getById(@RequestParam Long id) {
+        return BranchDTO.convertToDTO(branchService.getById(id));
     }
 
     @PutMapping("update")
-    public Branch updateBranch(@RequestParam Long id,
-                               @RequestParam String updateName,
-                               @RequestParam String updateLocation) throws Exception {
-        return branchService.updateBranch(id, updateName, updateLocation);
+    public BranchDTO updateBranch(@Valid @RequestBody BranchDTO dto) throws Exception {
+        return BranchDTO.convertToDTO(branchService.updateBranch(
+                dto.getBranchId(),
+                dto.getBranchName(),
+                dto.getBranchLocation()));
     }
 
     @DeleteMapping("deleteById")
