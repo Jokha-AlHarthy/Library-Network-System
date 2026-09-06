@@ -11,9 +11,9 @@ import java.util.List;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category,Long> {
-    @Query("SELECT b FROM Branch b WHERE b.isActive=true")
+    @Query("SELECT c FROM Category c WHERE c.isActive=true")
     List<Category> getAllCategories();
 
-    @Query("SELECT b FROM Branch b WHERE b.isActive=true AND b.id=:category")
+    @Query("SELECT c FROM Category c WHERE c.isActive=true AND c.id=:category")
     Category getById(@Param("category") Long id);
 }
