@@ -2,6 +2,7 @@ package com.mini.project.dto;
 
 import com.mini.project.entities.Reservation;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,7 @@ public class ReservationDTO {
     @Positive
     private Long reservationId;
 
+    @PastOrPresent(message = "Reservation date cannot be in the future")
     private Date reservationDate;
 
     @NotBlank(message = "Reservation status cannot be blank")
