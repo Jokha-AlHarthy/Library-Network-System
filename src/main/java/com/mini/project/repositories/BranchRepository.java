@@ -16,4 +16,13 @@ public interface BranchRepository extends JpaRepository<Branch, Long> {
 
     @Query("SELECT b FROM Branch b WHERE b.isActive=true AND b.id=:branch")
     Branch getById(@Param("branch") Long id);
+
+    @Query("""
+       SELECT b.name, COUNT(book.id)
+       FROM Branch b
+       LEFT JOIN b.books book
+       WHERE b.isActive=true
+       GROUP BY b.id, b.name
+       """)
+    List<Object[]> getBranchStats();
 }
