@@ -16,10 +16,10 @@ public class Branch extends BaseClass{
     private String location;
 
     @OneToMany(cascade = CascadeType.ALL)
-    private List<Books> books;
+    private List<Book> books;
 
     @OneToMany(cascade = CascadeType.ALL)
-    private List<Members> members;
+    private List<Member> members;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Staff> staffs;
