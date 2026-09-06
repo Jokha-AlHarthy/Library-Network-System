@@ -52,7 +52,6 @@ public class BranchService {
         }
         branchToUpdate.setUpdatedDate(new Date());
         branchToUpdate.setName(updateName);
-        branchToUpdate.setName(updateName);
         branchToUpdate.setLocation(updateLocation);
         branchToUpdate = branchRepository.save(branchToUpdate);
         return branchToUpdate;
