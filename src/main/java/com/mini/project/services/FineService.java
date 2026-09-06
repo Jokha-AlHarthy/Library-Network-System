@@ -71,4 +71,23 @@ public class FineService {
         fineRepository.save(deleteFine);
         return true;
     }
+
+    public Boolean payFine(Long id) throws Exception {
+        Fine fine = fineRepository.getById(id);
+        if (fine == null) {
+            throw new Exception("Fine not found");
+        }
+        fine.setStatus("PAID");
+        fine.setUpdatedDate(new Date());
+        fineRepository.save(fine);
+        return true;
+    }
+
+    public List<Fine> getUnpaidFines() {
+        return fineRepository.getUnpaidFines();
+    }
+
+    public List<Object[]> getMemberFines() {
+        return fineRepository.getMemberFines();
+    }
 }
