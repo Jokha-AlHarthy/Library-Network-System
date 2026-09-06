@@ -2,6 +2,7 @@ package com.mini.project.services;
 
 import com.mini.project.entities.Author;
 import com.mini.project.entities.Member;
+import com.mini.project.exceptions.ResourceNotFoundException;
 import com.mini.project.repositories.AuthorRepository;
 import com.mini.project.repositories.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,14 +44,17 @@ public class MemberService {
         if (member.isPresent() && member.get().getIsActive()) {
             return member.get();
         }
-        return new Member();
+        throw new ResourceNotFoundException("Member not found with id: " + id);
     }
 
     //Update service
     public Member updateMember(Long id, String updateName, String updateEmail, String updatePhoneNumber,String updateMembershipType ) throws Exception{
-        Member memberToUpdate =  memberRepository.getById(id);
-        if(memberToUpdate==null){
-            throw new Exception("Member is not found by the id");
+        Member memberToUpdate = memberRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Member not found with id: " + id));
+
+        if (!memberToUpdate.getIsActive()) {
+            throw new ResourceNotFoundException("Member not found with id: " + id);
         }
         memberToUpdate.setUpdatedDate(new Date());
         memberToUpdate.setName(updateName);
@@ -63,9 +67,12 @@ public class MemberService {
 
     //Delete service
     public Boolean deleteById(Long id){
-        Member deleteMember = memberRepository.getById(id);
-        if(deleteMember == null){
-            return false;
+        Member deleteMember = memberRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Member not found with id: " + id));
+
+        if (!deleteMember.getIsActive()) {
+            throw new ResourceNotFoundException("Member not found with id: " + id);
         }
         deleteMember.setIsActive(false);
         deleteMember.setUpdatedDate(new Date());
