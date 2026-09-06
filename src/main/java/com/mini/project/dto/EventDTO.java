@@ -1,6 +1,7 @@
 package com.mini.project.dto;
 
 import com.mini.project.entities.Event;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
@@ -23,6 +24,7 @@ public class EventDTO {
     @Size(min = 3, max = 100, message = "Event title has to be between 3 and 100 characters")
     private String eventTitle;
 
+    @Future(message = "Event date must be in the future")
     private Date eventDate;
 
     @NotBlank(message = "Event description cannot be blank")
