@@ -15,5 +15,5 @@ public class Category extends BaseClass{
     private String name;
     private String description;
     @OneToMany(cascade = CascadeType.ALL)
-    private List<Books> books;
+    private List<Book> books;
 }
