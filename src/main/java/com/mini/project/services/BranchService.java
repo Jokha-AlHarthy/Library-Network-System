@@ -2,6 +2,7 @@ package com.mini.project.services;
 
 import com.mini.project.entities.Author;
 import com.mini.project.entities.Branch;
+import com.mini.project.exceptions.ResourceNotFoundException;
 import com.mini.project.repositories.AuthorRepository;
 import com.mini.project.repositories.BranchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,14 +42,17 @@ public class BranchService {
         if (branch.isPresent() && branch.get().getIsActive()) {
             return branch.get();
         }
-        return new Branch();
+        throw new ResourceNotFoundException("Branch not found with id: " + id);
     }
 
     //Update service
     public Branch updateBranch(Long id, String updateName, String updateLocation) throws Exception{
-        Branch branchToUpdate =  branchRepository.getById(id);
-        if(branchToUpdate==null){
-            throw new Exception("Branch is not found by the id");
+        Branch branchToUpdate = branchRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Branch not found with id: " + id));
+
+        if (!branchToUpdate.getIsActive()) {
+            throw new ResourceNotFoundException("Branch not found with id: " + id);
         }
         branchToUpdate.setUpdatedDate(new Date());
         branchToUpdate.setName(updateName);
@@ -59,9 +63,12 @@ public class BranchService {
 
     //Delete service
     public Boolean deleteById(Long id){
-        Branch deleteBranch = branchRepository.getById(id);
-        if(deleteBranch == null){
-            return false;
+        Branch deleteBranch = branchRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Branch not found with id: " + id));
+
+        if (!deleteBranch.getIsActive()) {
+            throw new ResourceNotFoundException("Branch not found with id: " + id);
         }
         deleteBranch.setIsActive(false);
         deleteBranch.setUpdatedDate(new Date());
