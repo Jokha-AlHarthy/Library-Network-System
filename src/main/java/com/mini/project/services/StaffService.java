@@ -2,6 +2,7 @@ package com.mini.project.services;
 
 import com.mini.project.entities.Author;
 import com.mini.project.entities.Staff;
+import com.mini.project.exceptions.ResourceNotFoundException;
 import com.mini.project.repositories.AuthorRepository;
 import com.mini.project.repositories.StaffRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,14 +43,19 @@ public class StaffService {
         if (staff.isPresent() && staff.get().getIsActive()) {
             return staff.get();
         }
-        return new Staff();
+        throw new ResourceNotFoundException("Staff not found with id: " + id);
     }
 
     //Update service
     public Staff updateStaff(Long id, String updateName, String updateRole, String updatePhoneNumber) throws Exception{
-        Staff staffToUpdate =  staffRepository.getById(id);
-        if(staffToUpdate==null){
-            throw new Exception("Staff is not found by the id");
+        Staff staffToUpdate = staffRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Staff not found with id: " + id));
+
+        if (!staffToUpdate.getIsActive()) {
+            throw new ResourceNotFoundException(
+                    "Staff not found with id: " + id);
         }
         staffToUpdate.setUpdatedDate(new Date());
         staffToUpdate.setName(updateName);
@@ -61,9 +67,14 @@ public class StaffService {
 
     //Delete service
     public Boolean deleteById(Long id){
-        Staff deleteStaff = staffRepository.getById(id);
-        if(deleteStaff == null){
-            return false;
+        Staff deleteStaff = staffRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Staff not found with id: " + id));
+
+        if (!deleteStaff.getIsActive()) {
+            throw new ResourceNotFoundException(
+                    "Staff not found with id: " + id);
         }
         deleteStaff.setIsActive(false);
         deleteStaff.setUpdatedDate(new Date());
