@@ -1,7 +1,9 @@
 package com.mini.project.controllers;
 
+import com.mini.project.dto.ReviewDTO;
 import com.mini.project.entities.Review;
 import com.mini.project.services.ReviewService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,29 +21,31 @@ public class ReviewController {
     }
 
     @PostMapping("add")
-    public Long addReview(@RequestParam Integer rating,
-                          @RequestParam String comment,
-                          @RequestParam Date reviewDate) {
-        return reviewService.addReview(rating, comment, reviewDate);
+    public Long addReview(@Valid @RequestBody ReviewDTO dto) {
+        return reviewService.addReview(
+                dto.getRating(),
+                dto.getComment(),
+                dto.getReviewDate());
     }
 
     @GetMapping("getAll")
-    public List<Review> getAllReviews() {
-        return reviewService.getAllReviews();
+    public List<ReviewDTO> getAllReviews() {
+        List<ReviewDTO> reviews = ReviewDTO.convertToDTO(reviewService.getAllReviews());
+        return reviews;
     }
 
     @GetMapping("getById")
-    public Review getById(@RequestParam Long id) {
-        return reviewService.getById(id);
+    public ReviewDTO getById(@RequestParam Long id) {
+        return ReviewDTO.convertToDTO(reviewService.getById(id));
     }
 
     @PutMapping("update")
-    public Review updateReview(@RequestParam Long id,
-                               @RequestParam Integer updateRating,
-                               @RequestParam String updateComment,
-                               @RequestParam Date updateReviewDate) throws Exception {
-        return reviewService.updateReview(id, updateRating,
-                updateComment, updateReviewDate);
+    public ReviewDTO updateReview(@Valid @RequestBody ReviewDTO dto) throws Exception {
+        return ReviewDTO.convertToDTO(reviewService.updateReview(
+                dto.getReviewId(),
+                dto.getRating(),
+                dto.getComment(),
+                dto.getReviewDate()));
     }
 
     @DeleteMapping("deleteById")
